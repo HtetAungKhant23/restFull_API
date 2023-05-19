@@ -85,7 +85,7 @@ exports.createPost = (req, res, next) => {
         })
 }
 
-exports.updatedPost = (req, res, next) => {
+exports.updatePost = (req, res, next) => {
     const postId = req.params.postId;
 
     const errors = validationResult(req);
@@ -118,9 +118,10 @@ exports.updatedPost = (req, res, next) => {
                 throw err;
             }
 
-            if(imgUrl !== post.imgUrl){
-                clearImage(post.imgUrl);
-            }
+            // if(imgUrl !== post.imgUrl){
+            //     clearImage(post.imgUrl);
+            // }
+            clearImage(post.imgUrl);
 
             post.title = title;
             post.content = content;
@@ -147,4 +148,31 @@ exports.updatedPost = (req, res, next) => {
 const clearImage = (filePath) => {
     filePath = path.join(__dirname, '..', filePath);
     fs.unlink(filePath, err => console.log(err, "is here?"));
+    // fs.unlink(filePath);
+}
+
+exports.deletePost = (req, res, next) => {
+    const postId = req.params.postId;
+    Post.findById(postId)
+        .then(post => {
+            if(!post){
+                const err = new Error('post not found!');
+                err.statusCode = 422;
+                throw err;
+            }
+            clearImage(post.imgUrl);
+            return Post.findByIdAndRemove(postId);
+        })
+        .then(result => {
+            console.log('Post deleted!');
+            res.status(200).json({
+                message: 'Post deleted!'
+            })
+        })
+        .catch(err => {
+            if(!err.statusCode){
+                err.statusCode = 500;
+            }
+            next(err);
+        })
 }
