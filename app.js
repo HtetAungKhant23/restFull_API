@@ -2,6 +2,7 @@ const express = require('express');
 const path = require('path');
 const mongoose = require('mongoose');
 const multer = require('multer');
+const uuidv4 = require('uuid');
 
 const authRoutes = require('./routes/auth');
 const feedRoutes = require('./routes/feed');
@@ -10,18 +11,18 @@ const app = express();
 
 const fileStorage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, 'images');
+        cb(null, "images");
     },
     filename: (req, file, cb) => {
-        cb(null, file.originalname);
+        cb(null, uuidv4.v4() + "-" + file.originalname);
     }
 });
 
 const fileFilter = (req, file, cb) => {
     if(
-        file.mimetype === 'image/jpg' || 
-        file.mimetype === 'image/jpeg' ||
-        file.mimetype === 'image/png'
+        file.mimetype === 'image/png' ||
+        file.mimetype === 'image/jpg' ||
+        file.mimetype === 'image/jpeg'
     ){
         cb(null, true);
     }else{
@@ -33,8 +34,8 @@ app.use(express.json());
 app.use('/images', express.static(path.join(__dirname, 'images')));
 
 app.use(
-    multer({storage: fileStorage, fileFilter: fileFilter}).single('image')
-);
+    multer({storage: fileStorage, fileFilter: fileFilter}).single('imgUrl')
+)
 
 app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -51,6 +52,7 @@ app.use((error, req, res, next) => {
     const status = error.statusCode || 500;
     const message = error.message;
     const data = error.data;
+    console.log( error.message);
     res.status(status).json({
         message: message,
         data: data
@@ -59,7 +61,7 @@ app.use((error, req, res, next) => {
 
 mongoose
     .connect(
-        'mongodb+srv://root:root@cluster0.ksor6cg.mongodb.net/firstapi?retryWrites=true&w=majority',
+        'mongodb://root:root@ac-ylfcoft-shard-00-00.ksor6cg.mongodb.net:27017,ac-ylfcoft-shard-00-01.ksor6cg.mongodb.net:27017,ac-ylfcoft-shard-00-02.ksor6cg.mongodb.net:27017/firstapi?ssl=true&replicaSet=atlas-ylla10-shard-0&authSource=admin&retryWrites=true&w=majority',
         {
             useNewUrlParser: true,
             useUnifiedTopology: true
@@ -70,5 +72,5 @@ mongoose
         app.listen(8080);
     })
     .catch(err => {
-        console.log(err);
+        console.log(err, "hehe");
     })
