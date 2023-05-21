@@ -4,11 +4,11 @@ const controllers = require('../controllers/feed');
 const router = express.Router();
 
 
-router.get('/posts', controllers.getPost);
+router.get('/', controllers.getPost);
 
-router.get('/posts/:postId', controllers.getPostById);
+router.get('/:postId', controllers.getPostById);
 
-router.post('/post', 
+router.post('/', 
 [
     body('title')
         .trim()
@@ -19,7 +19,7 @@ router.post('/post',
 ]
 , controllers.createPost);
 
-router.put('/post/:postId', 
+router.put('/:postId', 
 [
     body('title')
         .trim()
@@ -30,7 +30,7 @@ router.put('/post/:postId',
 ]
 , controllers.updatePost);
 
-router.delete('/post/:postId', controllers.deletePost);
+router.delete('/:postId', controllers.deletePost);
 
 
 module.exports = router;

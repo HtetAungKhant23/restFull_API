@@ -49,16 +49,10 @@ app.use('/feed', feedRoutes);
 
 app.use((error, req, res, next) => {
     const status = error.statusCode || 500;
-    const message = error.message;
-    let errMsg = [];
-    message.forEach((data => {
-        console.log(data.msg);
-        errMsg.push(data.msg);
-    }))
-    console.log( error.data);
+    const message = error.message[0].msg;
+    console.log(message);
     res.status(status).json({
-        message: message,
-        data: errMsg
+        message: message
     });
 });
 
