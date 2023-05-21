@@ -96,23 +96,30 @@ exports.signup = (req, res, next) => {
 exports.signin = (req, res, next) => {
     const email = req.body.email;
     const password = req.body.password;
-    let userDb;
+    let loadedUser;
 
     User.findOne({email: email})
         .then(user => {
             console.log(user);
-            if(user){
-                userDb = user;
-                return bcrypt.hash(password, 12);         
+            if(!user){
+                const err = new Error('User with this email could not found!');
+                err.statusCode = 401;
+                throw err;        
             }
+            loadedUser = user;
+            return bcrypt.compare(password, user.password);
         })
-        .then(hashedPw => {
-            if(hashedPw === userDb.password){
-                res.status(200).json({
-                    message: 'successfully login!',
-                    user: userDb
-                })
+        .then(isEqual => {
+            console.log(isEqual);
+            if(!isEqual){
+                const err = new Error('Wrong password!');
+                err.statusCode = 401;
+                throw err;
             }
+            res.status(200).json({
+                message: 'successfully login!',
+                user: loadedUser
+            })
         })
         .catch(err => {
             if(!err.statusCode){
