@@ -60,6 +60,7 @@ router.put('/signin',
         .trim()
         .not()
         .isEmpty()
+        .withMessage('please enter password!')
 ], controllers.signin);
 
 module.exports = router;

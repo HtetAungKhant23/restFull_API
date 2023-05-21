@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const User = require('../models/user');
 const { validationResult } = require('express-validator');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
 exports.getUser = (req, res, next) => {
     User.find()
@@ -94,31 +95,45 @@ exports.signup = (req, res, next) => {
 }
 
 exports.signin = (req, res, next) => {
+    const errors = validationResult(req);
+    if(!errors.isEmpty()){
+        const err = new Error('validation failed!');
+        err.statusCode = 422;
+        throw err;
+    }
+
     const email = req.body.email;
     const password = req.body.password;
-    let loadedUser;
+    let loadedUser; 
 
     User.findOne({email: email})
         .then(user => {
-            console.log(user);
             if(!user){
                 const err = new Error('User with this email could not found!');
                 err.statusCode = 401;
-                throw err;        
+                throw err;
             }
             loadedUser = user;
             return bcrypt.compare(password, user.password);
         })
         .then(isEqual => {
-            console.log(isEqual);
             if(!isEqual){
-                const err = new Error('Wrong password!');
+                const err = new Error('your password is not match!');
                 err.statusCode = 401;
                 throw err;
             }
+
+            return jwt.sign({
+                userId: loadedUser._id.toString()
+            }, 'asdfasdfwerwerasdfopaiufdw');
+
+        })
+        .then(token => {
+            console.log(token);
             res.status(200).json({
-                message: 'successfully login!',
-                user: loadedUser
+                message: 'successfully signin!',
+                token: token,
+                name: loadedUser.name
             })
         })
         .catch(err => {
@@ -128,6 +143,3 @@ exports.signin = (req, res, next) => {
             next(err);
         })
 }
-
-
-
