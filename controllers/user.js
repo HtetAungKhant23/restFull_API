@@ -124,8 +124,9 @@ exports.signin = (req, res, next) => {
             }
 
             return jwt.sign({
+                email: loadedUser.email,
                 userId: loadedUser._id.toString()
-            }, 'asdfasdfwerwerasdfopaiufdw');
+            }, 'thisislongstringfortoken');
 
         })
         .then(token => {

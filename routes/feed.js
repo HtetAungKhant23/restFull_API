@@ -2,13 +2,13 @@ const { body } = require('express-validator');
 const express = require('express');
 const controllers = require('../controllers/feed');
 const router = express.Router();
+const isAuth = require('../middlewares/is-auth');
 
+router.get('/', isAuth, controllers.getPost);
 
-router.get('/', controllers.getPost);
+router.get('/:postId', isAuth, controllers.getPostById);
 
-router.get('/:postId', controllers.getPostById);
-
-router.post('/', 
+router.post('/', isAuth,
 [
     body('title')
         .trim()
@@ -19,7 +19,7 @@ router.post('/',
 ]
 , controllers.createPost);
 
-router.put('/:postId', 
+router.put('/:postId', isAuth,
 [
     body('title')
         .trim()
@@ -30,7 +30,7 @@ router.put('/:postId',
 ]
 , controllers.updatePost);
 
-router.delete('/:postId', controllers.deletePost);
+router.delete('/:postId', isAuth, controllers.deletePost);
 
 
 module.exports = router;
