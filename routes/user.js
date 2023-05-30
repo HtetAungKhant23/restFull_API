@@ -21,13 +21,13 @@ router.put('/signup',
     body('password')
         .trim()
         .isLength({min: 8})
+        .withMessage('password is not strong enough!')
         .not()
         .isUppercase()
         .not()
         .isLowercase()
         .not()
         .isAlphanumeric()
-        .withMessage('password is not strong enough!')
         .custom((value, {req}) => {
             const conPass = req.body.confirmPassword;
             if(value !== conPass){

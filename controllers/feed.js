@@ -35,6 +35,7 @@ exports.getPostById = (req, res, next) => {
             });
         })
         .catch(err => {
+            console.log('here it is', err.message);
             if(!err.statusCode){
                 err.statusCode = 500;
             }
@@ -61,6 +62,7 @@ exports.createPost = (req, res, next) => {
     const content = req.body.content;
     const imgUrl = req.file.path.replace('\\','/');
     console.log(imgUrl);
+    
     let creator;
 
     const post = new Post({
@@ -149,13 +151,14 @@ exports.updatePost = (req, res, next) => {
             });
         })
         .catch(err => {
+            console.log('this is error hahaha!')
             if(!err.statusCode){
                 err.statusCode = 500;
             }
             next(err);
         })
 }
-
+   
 const clearImage = (filePath) => {
     filePath = path.join(__dirname, '..', filePath);
     fs.unlink(filePath, err => console.log(err, "is here?"));
